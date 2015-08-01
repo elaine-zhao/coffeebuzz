@@ -1,0 +1,67 @@
+IndoorAtlas Android SDK
+
+-- Changelog --
+Legend:
+    @: optimization
+    +: new feature
+    #: bug fix
+    -: removed feature
+    *: note
+
+v.1.4.2-beta:
+    @: reduced logging
+    #: Fix for re-triggering wifi scanning after hotspot if wifi samples is not received. 
+
+v.1.4.1-beta:
+    +: SDK is now Android API 10 compatible. Note that SDK still has other requirements to work
+       properly such as magnetic sensor, accelerometer, gyro and WiFi.
+    #: Fixed case where max calibration percentage was returned as 100.0 instead of 1.0
+
+v.1.4.0-beta:
+    +: Automatic background sensor calibration. Required time and device movement for reaching full
+       calibration has been greatly reduced
+    +: Because calibration is maintained continuously, positioning can be started immediately
+       without an initial calibration movement. Do NOT wait for
+       IndoorAtlasListener#onCalibrationReady() callback in order to start positioning.
+    +: Support devices without uncalibrated magnetic sensor (API level < 18)
+    @: IndoorAtlas#isCalibrationReady() now always returns true
+    -: IndoorAtlasListener#onCalibrationFailed(String) is deprecated and not called anymore
+    -: IndoorAtlasListener#onCalibrationInvalid() is deprecated and not called anymore
+    -: ErrorCodes#NOT_CALIBRATED is deprecated and not used anymore
+    -: CalibrationEvent#IDLE is deprecated and not used anymore
+    -: CalibrationEvent#RESTARTED is deprecated and not used anymore
+    -: CalibrationEvent#WAITING_FOR_ANDROID_INTERNAL_CALIBRATION is deprecated and not used anymore
+    #: Internal bug fixes
+
+v.1.3.3-beta:
+    +: JDK6 compatibility
+
+v.1.3.2-beta:
+    #: Fixed crash that sometimes occurred in call sequence IndoorAtlas#stopPositioning,
+       IndoorAtlas#tearDown
+    *: Improved WiFi scanning
+    +: Javadocs for floor plan loading
+
+v.1.3.1-beta:
+    #: Fixed issue where calibration did not (sometimes) progress
+    #: Fixed handling difference between server and client system time
+    #: Fixed ServiceState#getHeadingDegrees to return correct values
+    +: Improved WiFi scan results handling
+
+v1.3.0-beta:
+    +: Improved sensor timestamp handling
+    +: Improved sensors reading logic to overcome case where sensor provides very low frequency
+       samples
+    #: Several bug fixes
+
+v1.0.1-beta:
+    #: Fixed submitting explicit position
+    #: Fixed previously missing values for ServiceState#getRoundtrip and
+       ServiceState#getMessagesInQueue
+
+v1.0-beta:
+    @: Amount of data send over network has been reduced up to 90%
+    @: Several internal improvements to reduce CPU and memory load
+    +: Added possibility to indicate explicit location to positioning service
+       (use e.g. with Beacons of other known locations)
+

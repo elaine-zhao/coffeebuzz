@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">IndoorAtlas SDK Example</string>
+    <string name="action_clear_log">Clear</string>
+    <string name="action_toggle_positioning">Start/stop positioning</string>
+
+</resources>
