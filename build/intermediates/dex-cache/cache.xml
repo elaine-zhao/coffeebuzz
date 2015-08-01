@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="C:\Users\ezhao7190672\.gradle\caches\modules-2\files-2.1\com.parse.bolts\bolts-android\1.2.0\6ee2953ccf51ce72b6d548c30c4633b99eb4f9dd\bolts-android-1.2.0.jar"
+        jumboMode="false"
+        revision="22.0.0"
+        sha1="6ee2953ccf51ce72b6d548c30c4633b99eb4f9dd">
+        <dex dex="C:\Users\ezhao7190672\Documents\Parse-Starter-Project-1.9.4\ParseStarterProject\build\intermediates\pre-dexed\debug\bolts-android-1.2.0-542ef34ff3e96b6e5af1713fdc9e0ff4f2963357.jar" />
+    </item>
+    <item
+        jar="C:\Users\ezhao7190672\Documents\Parse-Starter-Project-1.9.4\ParseStarterProject\libs\ParseCrashReporting-1.9.4.jar"
+        jumboMode="false"
+        revision="22.0.0"
+        sha1="7a11f2d74111fd9b02c2d091a1b76b82f6a4357e">
+        <dex dex="C:\Users\ezhao7190672\Documents\Parse-Starter-Project-1.9.4\ParseStarterProject\build\intermediates\pre-dexed\debug\ParseCrashReporting-1.9.4-a784da50aef146a494b15556c6351d15fa026ed4.jar" />
+    </item>
+    <item
+        jar="C:\Users\ezhao7190672\Documents\Parse-Starter-Project-1.9.4\ParseStarterProject\libs\Parse-1.9.4.jar"
+        jumboMode="false"
+        revision="22.0.0"
+        sha1="56c22930b5d4f77015b6a40c7f14103d3e101001">
+        <dex dex="C:\Users\ezhao7190672\Documents\Parse-Starter-Project-1.9.4\ParseStarterProject\build\intermediates\pre-dexed\debug\Parse-1.9.4-b6e30d33914b859551207a880fa4ea61881833d1.jar" />
+    </item>
+
+</items>
