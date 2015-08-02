@@ -2,6 +2,7 @@ package com.parse.starter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,12 +21,17 @@ import com.indooratlas.android.IndoorAtlasException;
 import com.indooratlas.android.IndoorAtlasFactory;
 import com.indooratlas.android.IndoorAtlasListener;
 import com.indooratlas.android.ServiceState;
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 
 import java.util.ArrayList;
 
 public class MakeCoffeeActivity extends Activity implements IndoorAtlasListener{
     private ListView mLogView;
     private LogAdapter mLogAdapter;
+    private static boolean deleteAll;
 
     private IndoorAtlas mIndoorAtlas;
     private boolean mIsPositioning;
@@ -40,7 +46,10 @@ public class MakeCoffeeActivity extends Activity implements IndoorAtlasListener{
 
     private double longitude;
     private double latitude;
-
+    private ParseObject retrieved;
+    private ArrayList<Double> latList = new ArrayList<>();
+    private ArrayList<Double> longList = new ArrayList<>();
+    private TextView txt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +57,9 @@ public class MakeCoffeeActivity extends Activity implements IndoorAtlasListener{
         setContentView(R.layout.activity_make_coffee);
 //        mLogAdapter = new LogAdapter(this);
 //        mLogView.setAdapter(mLogAdapter);
+        deleteAll = false;
+        txt = (TextView) findViewById(R.id.textView3);
+
     }
 
     @Override
@@ -85,19 +97,75 @@ public class MakeCoffeeActivity extends Activity implements IndoorAtlasListener{
         }
         startPositioning();
 
+    }
+
+    public void quit(View view) {
+        deleteAll = true;
+        Intent intent = new Intent(this, ParseStarterProjectActivity.class);
+        this.startActivity(intent);
+        //need to clean up the ParseObject's lists
+    }
+
+    public static boolean shouldDelete() {
+        return deleteAll;
+    }
+
+    public void calculate() {
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("RecipientList");
+        query.getInBackground(ParseStarterProjectActivity.getId(), new GetCallback<ParseObject>() {
+            public void done(ParseObject object, ParseException e) {
+                if (e == null) {
+                    MakeCoffeeActivity.this.retrieved = object;
+                    if (latList.size() == 0) {
+                        txt.setText("Ian drools");
+                        return;
+                    }
+                    latList = (ArrayList) MakeCoffeeActivity.this.retrieved.getList("latList");
+                    longList = (ArrayList) MakeCoffeeActivity.this.retrieved.getList("longList");
+                    double otherlat = 0;
+                    double otherlong = 0;
+                    if (latList.size() != 0 ) {
+                        otherlat = latList.get(0);
+                        otherlong = longList.get(0);
+                    }
+                    Log.e("MCA", (latitude - otherlat) + " fasdfasdf");
+                    Log.e("MCA", (longitude - otherlong) + "asdfasd");
+                    double horizontalDist = latitude - otherlat;
+                    double verticalDist = longitude -otherlong;
+                    txt.setText(calculateDirection(horizontalDist, verticalDist));
+                } else {
+                    // something went wrong
+                    Log.e("MCA", "ian babby");
+                    e.printStackTrace();
+                }
+            }
+        });
 
     }
 
-//    private void log(final String msg) {
-//        Log.d("hello", msg);
-//        runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                mLogAdapter.add(msg);
-//                mLogAdapter.notifyDataSetChanged();
-//            }
-//        });
-//    }
+    private String calculateDirection(double hd, double vd) {
+        if (Math.abs(hd) > Math.abs(2*vd)) {
+            if (hd > 0) {
+                return "Go East";
+            } else {
+                return "Go West";
+            }
+        } else if (Math.abs(vd) > Math.abs(2*hd)) {
+            if (vd > 0) {
+                return "Go North";
+            } else {
+                return "Go South";
+            }
+        } else if (hd > 0 && vd > 0) {
+            return "Go Northeast";
+        } else if (hd < 0 && vd > 0) {
+            return "Go Northwest";
+        } else if (hd > 0 && vd < 0) {
+            return "Go Southeast";
+        } else {
+            return "Go Southwest";
+        }
+    }
 
     private void startPositioning() {
         if (mIndoorAtlas != null) {
@@ -124,20 +192,6 @@ public class MakeCoffeeActivity extends Activity implements IndoorAtlasListener{
      * This is where you will handle location updates.
      */
     public void onServiceUpdate(ServiceState state) {
-
-//        mSharedBuilder.setLength(0);
-//        mSharedBuilder.append("Location: ")
-//                .append("\n\troundtrip : ").append(state.getRoundtrip()).append("ms")
-//                .append("\n\tlat : ").append(state.getGeoPoint().getLatitude())
-//                .append("\n\tlon : ").append(state.getGeoPoint().getLongitude())
-//                .append("\n\tX [meter] : ").append(state.getMetricPoint().getX())
-//                .append("\n\tY [meter] : ").append(state.getMetricPoint().getY())
-//                .append("\n\tI [pixel] : ").append(state.getImagePoint().getI())
-//                .append("\n\tJ [pixel] : ").append(state.getImagePoint().getJ())
-//                .append("\n\theading : ").append(state.getHeadingDegrees())
-//                .append("\n\tuncertainty: ").append(state.getUncertainty());
-
-//        android.util.Log.e(mSharedBuilder.toString());
         latitude = state.getGeoPoint().getLatitude();
         longitude = state.getGeoPoint().getLongitude();
         android.util.Log.e("MCA"," This is latitude " + latitude);
@@ -151,6 +205,8 @@ public class MakeCoffeeActivity extends Activity implements IndoorAtlasListener{
             android.util.Log.e("MCA","Stop positioning");
             mIndoorAtlas.stopPositioning();
         }
+        calculate();
+
     }
 
     @Override
@@ -254,5 +310,43 @@ public class MakeCoffeeActivity extends Activity implements IndoorAtlasListener{
             mLines.clear();
             notifyDataSetChanged();
         }
+    }
+
+    public void next(View view) {
+//        ParseQuery<ParseObject> query = ParseQuery.getQuery("RecipientList");
+//        Log.e("RCA", "query " + query);
+//        Log.e("RCA", ParseStarterProjectActivity.getId());
+//        query.getInBackground(ParseStarterProjectActivity.getId(), new GetCallback<ParseObject>() {
+//            public void done(ParseObject object, ParseException e) {
+//                if (e == null) {
+//                    MakeCoffeeActivity.this.retrieved = object;
+//                    Log.e("RCA", "Retrieved is this " + MakeCoffeeActivity.this.retrieved);
+////                    Log.e("RCA", retrieved.getObjectId());
+//                    Log.e("RCA", "wut parse");
+//                    Log.e("RCA", "Retrieved " + retrieved);
+//                    Log.e("RCA", "Retrieved is this " + MakeCoffeeActivity.this.retrieved);
+//                    latList = (ArrayList) MakeCoffeeActivity.this.retrieved.getList("latList");
+//                    longList = (ArrayList) MakeCoffeeActivity.this.retrieved.getList("longList");
+//                    Log.e("RCA", "fk parse");
+////                    coordList.add(gp);
+//                    latList.add(latitude);
+//                    longList.add(longitude);
+//                    Log.e("RCA", "buck parse");
+//                    retrieved.put("latList", latList);
+//                    retrieved.put("longList", longList);
+////                    retrieved.put("test", gp);
+//                    Log.e("RCA", "eat parse");
+//                    retrieved.saveInBackground();
+//                    Log.e("RCA", "bye parse");
+//                    Log.e("RCA", retrieved.getObjectId());
+//                    objectID = retrieved.getObjectId();
+//                    initial = latList.size();
+//                } else {
+//                    // something went wrong
+//                    Log.e("RCA", "ian babby");
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
     }
 }

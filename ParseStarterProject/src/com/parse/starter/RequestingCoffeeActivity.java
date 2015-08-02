@@ -2,7 +2,10 @@ package com.parse.starter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -12,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.EditText;
 
 import com.indooratlas.android.CalibrationState;
 import com.indooratlas.android.GeoPoint;
@@ -45,17 +49,103 @@ public class RequestingCoffeeActivity extends Activity implements IndoorAtlasLis
     private double longitude;
     private double latitude;
     private ParseObject retrieved;
-    private ArrayList<Double> coordList = new ArrayList<>();
+    private ArrayList<Double> latList = new ArrayList<>();
+    private ArrayList<Double> longList = new ArrayList<>();
     private static GeoPoint gp;
+    private int initial = 0;
+    private int rank = 0;
 
+    private String length = "0";
+    private TextView textElement;
+    private Handler uiCallback;
+    private static String objectID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.requesting);
+        textElement = (TextView) findViewById(R.id.testView3);
+        textElement.setText(length);
 //        mLogAdapter = new LogAdapter(this);
 //        mLogView.setAdapter(mLogAdapter);
         initGeoPoint();
+        uiCallback = new Handler () {
+            public void handleMessage (Message msg) {
+                // do stuff with UI
+                RequestingCoffeeActivity.this.textElement.setText(length);
+            }
+        };
+
+        Thread line = new Thread() {
+            public void run () {
+                Log.e("RCA", "MC " + ParseStarterProjectActivity.getMC());
+                while (ParseStarterProjectActivity.getMC()) {
+                    // do stuff in a separate thread
+                    ParseQuery<ParseObject> query = ParseQuery.getQuery("RecipientList");
+                    query.getInBackground(ParseStarterProjectActivity.getId(), new GetCallback<ParseObject>() {
+                        public void done(ParseObject object, ParseException e) {
+                            if (e == null) {
+                                RequestingCoffeeActivity.this.retrieved = object;
+                                latList = (ArrayList) RequestingCoffeeActivity.this.retrieved.getList("latList");
+                                int size = latList.size();
+                                if (initial >= size) {
+                                    rank = size;
+                                } else {
+                                    rank = initial;
+                                }
+                                length = "" + rank;
+
+                            } else {
+                                // something went wrong
+                                Log.e("RCA", "ian babby");
+                                e.printStackTrace();
+                            }
+                        }
+
+                    });
+                    Log.e("RCA", "Length " + length);
+
+                    uiCallback.sendEmptyMessage(0);
+                    try {
+                        Thread.sleep(3000);    // sleep for 3 seconds
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }
+        };
+        line.start();
+
+
+
+
+//        while (ParseStarterProjectActivity.getMC()) {
+//            ParseQuery<ParseObject> query = ParseQuery.getQuery("RecipientList");
+//            query.getInBackground(ParseStarterProjectActivity.getId(), new GetCallback<ParseObject>() {
+//                public void done(ParseObject object, ParseException e) {
+//                    if (e == null) {
+//                        RequestingCoffeeActivity.this.retrieved = object;
+//                        latList = (ArrayList) RequestingCoffeeActivity.this.retrieved.getList("latList");
+//                        int size = latList.size();
+//                        if (initial >= size) {
+//                            rank = size;
+//                        } else {
+//                            rank = initial;
+//                        }
+//                        length = "" + rank;
+//
+//                    } else {
+//                        // something went wrong
+//                        Log.e("RCA", "ian babby");
+//                        e.printStackTrace();
+//                    }
+//                }
+//
+//            });
+//            Log.e("RCA", "Length " + length);
+//            textElement.setText(length);
+//        }
     }
 
     @Override
@@ -94,17 +184,6 @@ public class RequestingCoffeeActivity extends Activity implements IndoorAtlasLis
         startPositioning();
     }
 
-//    private void log(final String msg) {
-//        Log.d("hello", msg);
-//        runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                mLogAdapter.add(msg);
-//                mLogAdapter.notifyDataSetChanged();
-//            }
-//        });
-//    }
-
     private void startPositioning() {
         if (mIndoorAtlas != null) {
             android.util.Log.e("RCA",String.format("startPositioning, venueId: %s, floorId: %s, floorPlanId: %s",
@@ -130,19 +209,6 @@ public class RequestingCoffeeActivity extends Activity implements IndoorAtlasLis
      * This is where you will handle location updates.
      */
     public void onServiceUpdate(ServiceState state) {
-//        mSharedBuilder.setLength(0);
-//        mSharedBuilder.append("Location: ")
-//                .append("\n\troundtrip : ").append(state.getRoundtrip()).append("ms")
-//                .append("\n\tlat : ").append(state.getGeoPoint().getLatitude())
-//                .append("\n\tlon : ").append(state.getGeoPoint().getLongitude())
-//                .append("\n\tX [meter] : ").append(state.getMetricPoint().getX())
-//                .append("\n\tY [meter] : ").append(state.getMetricPoint().getY())
-//                .append("\n\tI [pixel] : ").append(state.getImagePoint().getI())
-//                .append("\n\tJ [pixel] : ").append(state.getImagePoint().getJ())
-//                .append("\n\theading : ").append(state.getHeadingDegrees())
-//                .append("\n\tuncertainty: ").append(state.getUncertainty());
-
-//        android.util.Log.e(mSharedBuilder.toString());
         latitude = state.getGeoPoint().getLatitude();
         longitude = state.getGeoPoint().getLongitude();
         android.util.Log.e("RCA"," This is latitude " + latitude);
@@ -178,17 +244,22 @@ public class RequestingCoffeeActivity extends Activity implements IndoorAtlasLis
                     Log.e("RCA", "wut parse");
                     Log.e("RCA", "Retrieved " + retrieved);
                     Log.e("RCA", "Retrieved is this " + RequestingCoffeeActivity.this.retrieved);
-                    coordList = (ArrayList) RequestingCoffeeActivity.this.retrieved.getList("coordList");
+                    latList = (ArrayList) RequestingCoffeeActivity.this.retrieved.getList("latList");
+                    longList = (ArrayList) RequestingCoffeeActivity.this.retrieved.getList("longList");
                     Log.e("RCA", "fk parse");
 //                    coordList.add(gp);
-                    coordList.add(latitude);
+                    latList.add(latitude);
+                    longList.add(longitude);
                     Log.e("RCA", "buck parse");
-                    retrieved.put("coordList", coordList);
+                    retrieved.put("latList", latList);
+                    retrieved.put("longList", longList);
 //                    retrieved.put("test", gp);
                     Log.e("RCA", "eat parse");
                     retrieved.saveInBackground();
                     Log.e("RCA", "bye parse");
                     Log.e("RCA", retrieved.getObjectId());
+                    objectID = retrieved.getObjectId();
+                    initial = latList.size();
                 } else {
                     // something went wrong
                     Log.e("RCA", "ian babby");
@@ -197,6 +268,19 @@ public class RequestingCoffeeActivity extends Activity implements IndoorAtlasLis
             }
         });
 
+    }
+    
+    public void cancelRequest(View view) {
+        if (rank != 0) {
+            latList.remove(rank - 1);
+            longList.remove(rank - 1);
+        }
+        Intent intent = new Intent(this, ParseStarterProjectActivity.class);
+        this.startActivity(intent);
+    }
+
+    public static String getObjectID() {
+        return objectID;
     }
 
     @Override

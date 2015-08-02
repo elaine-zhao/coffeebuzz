@@ -23,4 +23,13 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="50dp"
         android:onClick="requestCoffee" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageView"
+        android:layout_above="@+id/button3"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="96dp"
+        android:src="@drawable/coffeebuzzbean"/>
 </RelativeLayout>
