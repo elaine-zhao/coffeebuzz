@@ -1,0 +1,12 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.indooratlas.example.EditCredentialsActivity">
+    <item
+        android:id="@+id/action_toggle_positioning"
+        android:title="@string/action_toggle_positioning"
+        android:showAsAction="never" />
+    <item
+        android:id="@+id/action_clear_log"
+        android:title="@string/action_clear_log"
+        android:showAsAction="never" />
+</menu>
