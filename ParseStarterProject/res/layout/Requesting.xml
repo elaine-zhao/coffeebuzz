@@ -11,9 +11,18 @@
         android:text="Cancel"
         android:id="@+id/button"
         android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="171dp"
-        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="107dp"
         android:onClick="cancelRequest"
+        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Send Request"
+        android:id="@+id/button8"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:onClick="sendToParse" />
 
 </RelativeLayout>
