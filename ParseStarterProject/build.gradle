@@ -15,6 +15,7 @@ dependencies {
     compile 'com.parse.bolts:bolts-android:1.2.0'
     compile fileTree(dir: 'libs', include: 'Parse-*.jar')
     compile fileTree(dir: 'libs', include: 'ParseCrashReporting-*.jar')
+    compile fileTree(dir: 'libs', include: 'indooratlas-android-sdk-1.4.2-132-beta.jar')
 }
 
 android {
