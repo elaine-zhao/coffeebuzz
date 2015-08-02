@@ -31,10 +31,10 @@ public class ParseStarterProjectActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-		Log.e("PSPA", "Hi " + RequestingCoffeeActivity.getObjectID());
-		if (RequestingCoffeeActivity.getObjectID() != null && !MakeCoffeeActivity.shouldDelete()) {
+//		if (RequestingCoffeeActivity.getObjectID() != null && !MakeCoffeeActivity.shouldDelete()) {
 			ParseQuery<ParseObject> query = ParseQuery.getQuery("RecipientList");
-			query.getInBackground(RequestingCoffeeActivity.getObjectID(), new GetCallback<ParseObject>() {
+//			query.getInBackground(RequestingCoffeeActivity.getObjectID(), new GetCallback<ParseObject>() {
+			query.getInBackground("kistarF7Gr", new GetCallback<ParseObject>() {
 				public void done(ParseObject object, ParseException e) {
 					if (e == null) {
 						ParseStarterProjectActivity.this.ps = object;
@@ -42,20 +42,20 @@ public class ParseStarterProjectActivity extends Activity {
 						ParseAnalytics.trackAppOpenedInBackground(getIntent());
 						ps.put("latList", latList);
 						ps.put("longList", longList);
-						ps.saveInBackground(new SaveCallback() {
-							@Override
-							public void done(ParseException e) {
-								if (e == null) {
-									// if null, it means the save has succeeded
-									ParseStarterProjectActivity.this.id = ps.getObjectId();
-									Log.e("PSPA", ParseStarterProjectActivity.this.id);// Here you go
-								} else {
-									// the save call was not successful.
-									e.printStackTrace();
-								}
-							}
-						});
-						Log.e("PSPA", "ok");
+//						ps.saveInBackground(new SaveCallback() {
+//							@Override
+//							public void done(ParseException e) {
+//								if (e == null) {
+//									// if null, it means the save has succeeded
+//									ParseStarterProjectActivity.this.id = ps.getObjectId();
+//								} else {
+//									// the save call was not successful.
+//									e.printStackTrace();
+//								}
+//							}
+//						});
+						ps.saveInBackground();
+						ParseStarterProjectActivity.this.id = "kistarF7Gr";
 					} else {
 						// something went wrong
 						Log.e("PSPA", "ian babby");
@@ -64,39 +64,34 @@ public class ParseStarterProjectActivity extends Activity {
 				}
 			});
 
-		} else {
+//		} else {
 			if (MakeCoffeeActivity.shouldDelete()) {
 				mc = false;
 			}
-			ps = new ParseObject("RecipientList");
-
-			ParseAnalytics.trackAppOpenedInBackground(getIntent());
-			ps.put("latList", latList);
-			ps.put("longList", longList);
-			ps.saveInBackground(new SaveCallback() {
-				@Override
-				public void done(ParseException e) {
-					if (e == null) {
-						// if null, it means the save has succeeded
-						ParseStarterProjectActivity.this.id = ps.getObjectId();
-						Log.e("PSPA", ParseStarterProjectActivity.this.id);// Here you go
-					} else {
-						// the save call was not successful.
-						e.printStackTrace();
-					}
-				}
-			});
-			Log.e("PSPA", "ok");
-		}
-
-
-//		Log.e("PSPA", ps.getObjectId());
+//			ps = new ParseObject("RecipientList");
+//
+//			ParseAnalytics.trackAppOpenedInBackground(getIntent());
+//			ps.put("latList", latList);
+//			ps.put("longList", longList);
+//			ps.saveInBackground(new SaveCallback() {
+//				@Override
+//				public void done(ParseException e) {
+//					if (e == null) {
+//						// if null, it means the save has succeeded
+//						ParseStarterProjectActivity.this.id = ps.getObjectId();
+//					} else {
+//						// the save call was not successful.
+//						e.printStackTrace();
+//					}
+//				}
+//			});
+//		}
 	}
 
 	public void makeCoffee(View view) {
-		if (mc) {
-			return;
-		}
+//		if (mc) {
+//			return;
+//		}
 
 		// send push notif that coffee is being made
 		ParsePush push = new ParsePush();

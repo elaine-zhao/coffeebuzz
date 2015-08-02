@@ -101,9 +101,24 @@ public class MakeCoffeeActivity extends Activity implements IndoorAtlasListener{
 
     public void quit(View view) {
         deleteAll = true;
+        //need to clean up the ParseObject's lists
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("RecipientList");
+        query.getInBackground(ParseStarterProjectActivity.getId(), new GetCallback<ParseObject>() {
+            public void done(ParseObject object, ParseException e) {
+                if (e == null) {
+                    MakeCoffeeActivity.this.retrieved = object;
+                    retrieved.put("latList", new ArrayList<>());
+                    retrieved.put("longList", new ArrayList<>());
+                    retrieved.saveInBackground();
+                } else {
+                    // something went wrong
+                    Log.e("MCA", "ian babby");
+                    e.printStackTrace();
+                }
+            }
+        });
         Intent intent = new Intent(this, ParseStarterProjectActivity.class);
         this.startActivity(intent);
-        //need to clean up the ParseObject's lists
     }
 
     public static boolean shouldDelete() {
@@ -116,20 +131,21 @@ public class MakeCoffeeActivity extends Activity implements IndoorAtlasListener{
             public void done(ParseObject object, ParseException e) {
                 if (e == null) {
                     MakeCoffeeActivity.this.retrieved = object;
-                    if (latList.size() == 0) {
-                        txt.setText("Ian drools");
-                        return;
-                    }
                     latList = (ArrayList) MakeCoffeeActivity.this.retrieved.getList("latList");
                     longList = (ArrayList) MakeCoffeeActivity.this.retrieved.getList("longList");
                     double otherlat = 0;
                     double otherlong = 0;
+                    Log.e("MCA", "latList: " + (ArrayList)  MakeCoffeeActivity.this.retrieved.getList("latList"));
+                    Log.e("MCA", "longList: " + (ArrayList) MakeCoffeeActivity.this.retrieved.getList("longList"));
                     if (latList.size() != 0 ) {
                         otherlat = latList.get(0);
                         otherlong = longList.get(0);
+                    } else {
+                        txt.setText("Nobody wants coffee");
+                        return;
                     }
                     Log.e("MCA", (latitude - otherlat) + " fasdfasdf");
-                    Log.e("MCA", (longitude - otherlong) + "asdfasd");
+                    Log.e("MCA", (longitude - otherlong) + " asdfasd");
                     double horizontalDist = latitude - otherlat;
                     double verticalDist = longitude -otherlong;
                     txt.setText(calculateDirection(horizontalDist, verticalDist));
@@ -312,35 +328,18 @@ public class MakeCoffeeActivity extends Activity implements IndoorAtlasListener{
         }
     }
 
-    public void next(View view) {
+//    public void next(View view) {
 //        ParseQuery<ParseObject> query = ParseQuery.getQuery("RecipientList");
-//        Log.e("RCA", "query " + query);
-//        Log.e("RCA", ParseStarterProjectActivity.getId());
 //        query.getInBackground(ParseStarterProjectActivity.getId(), new GetCallback<ParseObject>() {
 //            public void done(ParseObject object, ParseException e) {
 //                if (e == null) {
 //                    MakeCoffeeActivity.this.retrieved = object;
-//                    Log.e("RCA", "Retrieved is this " + MakeCoffeeActivity.this.retrieved);
-////                    Log.e("RCA", retrieved.getObjectId());
-//                    Log.e("RCA", "wut parse");
-//                    Log.e("RCA", "Retrieved " + retrieved);
-//                    Log.e("RCA", "Retrieved is this " + MakeCoffeeActivity.this.retrieved);
 //                    latList = (ArrayList) MakeCoffeeActivity.this.retrieved.getList("latList");
 //                    longList = (ArrayList) MakeCoffeeActivity.this.retrieved.getList("longList");
-//                    Log.e("RCA", "fk parse");
-////                    coordList.add(gp);
-//                    latList.add(latitude);
-//                    longList.add(longitude);
-//                    Log.e("RCA", "buck parse");
-//                    retrieved.put("latList", latList);
-//                    retrieved.put("longList", longList);
-////                    retrieved.put("test", gp);
-//                    Log.e("RCA", "eat parse");
 //                    retrieved.saveInBackground();
-//                    Log.e("RCA", "bye parse");
-//                    Log.e("RCA", retrieved.getObjectId());
-//                    objectID = retrieved.getObjectId();
-//                    initial = latList.size();
+//                    if (RequestingCoffeeActivity.getNextable()) {
+//                        Intent intent = new Intent(this, MakeCoffeeActivity.class);
+//                    }
 //                } else {
 //                    // something went wrong
 //                    Log.e("RCA", "ian babby");
@@ -348,5 +347,5 @@ public class MakeCoffeeActivity extends Activity implements IndoorAtlasListener{
 //                }
 //            }
 //        });
-    }
+//    }
 }

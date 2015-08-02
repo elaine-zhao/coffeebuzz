@@ -59,6 +59,7 @@ public class RequestingCoffeeActivity extends Activity implements IndoorAtlasLis
     private TextView textElement;
     private Handler uiCallback;
     private static String objectID;
+    private static boolean nextable = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,8 +67,6 @@ public class RequestingCoffeeActivity extends Activity implements IndoorAtlasLis
         setContentView(R.layout.requesting);
         textElement = (TextView) findViewById(R.id.testView3);
         textElement.setText(length);
-//        mLogAdapter = new LogAdapter(this);
-//        mLogView.setAdapter(mLogAdapter);
         initGeoPoint();
         uiCallback = new Handler () {
             public void handleMessage (Message msg) {
@@ -116,36 +115,6 @@ public class RequestingCoffeeActivity extends Activity implements IndoorAtlasLis
             }
         };
         line.start();
-
-
-
-
-//        while (ParseStarterProjectActivity.getMC()) {
-//            ParseQuery<ParseObject> query = ParseQuery.getQuery("RecipientList");
-//            query.getInBackground(ParseStarterProjectActivity.getId(), new GetCallback<ParseObject>() {
-//                public void done(ParseObject object, ParseException e) {
-//                    if (e == null) {
-//                        RequestingCoffeeActivity.this.retrieved = object;
-//                        latList = (ArrayList) RequestingCoffeeActivity.this.retrieved.getList("latList");
-//                        int size = latList.size();
-//                        if (initial >= size) {
-//                            rank = size;
-//                        } else {
-//                            rank = initial;
-//                        }
-//                        length = "" + rank;
-//
-//                    } else {
-//                        // something went wrong
-//                        Log.e("RCA", "ian babby");
-//                        e.printStackTrace();
-//                    }
-//                }
-//
-//            });
-//            Log.e("RCA", "Length " + length);
-//            textElement.setText(length);
-//        }
     }
 
     @Override
@@ -168,6 +137,14 @@ public class RequestingCoffeeActivity extends Activity implements IndoorAtlasLis
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public static boolean getNextable() {
+        return nextable;
+    }
+
+    public static void flipNextable() {
+        nextable = false;
     }
 
     public void initGeoPoint() {
@@ -231,33 +208,22 @@ public class RequestingCoffeeActivity extends Activity implements IndoorAtlasLis
     }
 
     public void sendToParse(View view) {
-        Log.e("RCA", "hi parse");
         ParseQuery<ParseObject> query = ParseQuery.getQuery("RecipientList");
-        Log.e("RCA", "query " + query);
-        Log.e("RCA", ParseStarterProjectActivity.getId());
         query.getInBackground(ParseStarterProjectActivity.getId(), new GetCallback<ParseObject>() {
             public void done(ParseObject object, ParseException e) {
                 if (e == null) {
                     RequestingCoffeeActivity.this.retrieved = object;
-                    Log.e("RCA", "Retrieved is this " + RequestingCoffeeActivity.this.retrieved);
-//                    Log.e("RCA", retrieved.getObjectId());
-                    Log.e("RCA", "wut parse");
-                    Log.e("RCA", "Retrieved " + retrieved);
-                    Log.e("RCA", "Retrieved is this " + RequestingCoffeeActivity.this.retrieved);
+                    Log.e("RCA", retrieved.getObjectId());
                     latList = (ArrayList) RequestingCoffeeActivity.this.retrieved.getList("latList");
                     longList = (ArrayList) RequestingCoffeeActivity.this.retrieved.getList("longList");
-                    Log.e("RCA", "fk parse");
-//                    coordList.add(gp);
                     latList.add(latitude);
                     longList.add(longitude);
-                    Log.e("RCA", "buck parse");
                     retrieved.put("latList", latList);
                     retrieved.put("longList", longList);
-//                    retrieved.put("test", gp);
-                    Log.e("RCA", "eat parse");
+                    Log.e("RCA", "latList: " + (ArrayList) RequestingCoffeeActivity.this.retrieved.getList("latList"));
+                    Log.e("RCA", "longList: " + (ArrayList) RequestingCoffeeActivity.this.retrieved.getList("longList"));
                     retrieved.saveInBackground();
                     Log.e("RCA", "bye parse");
-                    Log.e("RCA", retrieved.getObjectId());
                     objectID = retrieved.getObjectId();
                     initial = latList.size();
                 } else {
@@ -271,6 +237,9 @@ public class RequestingCoffeeActivity extends Activity implements IndoorAtlasLis
     }
     
     public void cancelRequest(View view) {
+        if (rank == 1) {
+            nextable = true;
+        }
         if (rank != 0) {
             latList.remove(rank - 1);
             longList.remove(rank - 1);
