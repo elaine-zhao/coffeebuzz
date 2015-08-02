@@ -27,7 +27,7 @@ public class ParseApplication extends Application {
     Parse.initialize(this, "LxwyMya38sfQC8NEBfkp1CWROtoJ64q1gq5vVjzZ", "GTr4QGDPmMcGfF0lFB4aVrtnZL6XEdOUTKi56GXR");
     ParseInstallation.getCurrentInstallation().saveInBackground();
 
-    // Subscribe application to push notifs on channel "coffeenotif" //TODO delete?
+    // Subscribe application to push notifs on channel "coffeenotif"
     ParsePush.subscribeInBackground("coffeenotif");
 
     ParseUser.enableAutomaticUser();

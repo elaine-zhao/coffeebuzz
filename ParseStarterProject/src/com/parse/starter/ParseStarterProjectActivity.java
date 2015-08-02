@@ -54,7 +54,7 @@ public class ParseStarterProjectActivity extends Activity {
 		// send push notif that coffee is being made
 		ParsePush push = new ParsePush();
 		push.setChannel("coffeenotif");
-		push.setMessage("Someone is making a fresh pot of coffee. Hit \"Request\" now to request a coffee delivery.");
+		push.setMessage("Someone is making a fresh pot of coffee. Hit \"Request\" to request a coffee delivery.");
 		push.sendInBackground();
 
 		mc = true;
