@@ -8,6 +8,7 @@ import com.indooratlas.android.GeoPoint;
 import com.parse.ParseAnalytics;
 import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.ParsePush;
 import com.parse.SaveCallback;
 
 import android.util.Log;
@@ -50,13 +51,19 @@ public class ParseStarterProjectActivity extends Activity {
 			return;
 		}
 
+		// send push notif that coffee is being made
+		ParsePush push = new ParsePush();
+		push.setChannel("coffeenotif");
+		push.setMessage("Someone is making a fresh pot of coffee. Hit \"Request\" now to request a coffee delivery.");
+		push.sendInBackground();
+
 		mc = true;
 		Intent intent = new Intent(this, MakeCoffeeActivity.class);
 		this.startActivity(intent);
 	}
 
     public static String getId() {
-        return id;
+		return id;
     }
 
 	public void requestCoffee(View view) {

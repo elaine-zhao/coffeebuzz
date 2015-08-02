@@ -6,6 +6,7 @@ import com.parse.Parse;
 import com.parse.ParseACL;
 import com.parse.ParseCrashReporting;
 import com.parse.ParseInstallation;
+import com.parse.ParsePush;
 import com.parse.ParseUser;
 
 public class ParseApplication extends Application {
@@ -25,6 +26,9 @@ public class ParseApplication extends Application {
 //    Parse.initialize(this, "LxwyMya38sfQC8NEBfkp1CWROtoJ64q1gq5vVjzZ", "GTr4QGDPmMcGfF0lFB4aVrtnZL6XEdOUTKi56GXR");
     Parse.initialize(this, "LxwyMya38sfQC8NEBfkp1CWROtoJ64q1gq5vVjzZ", "GTr4QGDPmMcGfF0lFB4aVrtnZL6XEdOUTKi56GXR");
     ParseInstallation.getCurrentInstallation().saveInBackground();
+
+    // Subscribe application to push notifs on channel "coffeenotif" //TODO delete?
+    ParsePush.subscribeInBackground("coffeenotif");
 
     ParseUser.enableAutomaticUser();
     ParseACL defaultACL = new ParseACL();

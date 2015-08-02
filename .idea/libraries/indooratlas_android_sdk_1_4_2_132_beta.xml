@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="indooratlas-android-sdk-1.4.2-132-beta">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/ParseStarterProject/libs/indooratlas-android-sdk-1.4.2-132-beta.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
