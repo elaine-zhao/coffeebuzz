@@ -17,7 +17,7 @@ import java.util.ArrayList;
 
 public class ParseStarterProjectActivity extends Activity {
 	private boolean mc = false;
-	private ArrayList<GeoPoint> coordList = new ArrayList<>();
+	private ArrayList<Double> coordList = new ArrayList<>();
 	private ParseObject ps = new ParseObject("RecipientList");
     private static String id;
 

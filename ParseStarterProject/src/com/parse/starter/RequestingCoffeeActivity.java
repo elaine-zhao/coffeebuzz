@@ -1,33 +1,31 @@
-
-
 package com.parse.starter;
 
-        import android.app.Activity;
-        import android.content.Context;
-        import android.os.Bundle;
-        import android.util.Log;
-        import android.view.LayoutInflater;
-        import android.view.Menu;
-        import android.view.MenuItem;
-        import android.view.View;
-        import android.view.ViewGroup;
-        import android.widget.BaseAdapter;
-        import android.widget.ListView;
-        import android.widget.TextView;
+import android.app.Activity;
+import android.content.Context;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
 
-        import com.indooratlas.android.CalibrationState;
-        import com.indooratlas.android.GeoPoint;
-        import com.indooratlas.android.IndoorAtlas;
-        import com.indooratlas.android.IndoorAtlasException;
-        import com.indooratlas.android.IndoorAtlasFactory;
-        import com.indooratlas.android.IndoorAtlasListener;
-        import com.indooratlas.android.ServiceState;
-        import com.parse.GetCallback;
-        import com.parse.ParseException;
-        import com.parse.ParseObject;
-        import com.parse.ParseQuery;
+import com.indooratlas.android.CalibrationState;
+import com.indooratlas.android.GeoPoint;
+import com.indooratlas.android.IndoorAtlas;
+import com.indooratlas.android.IndoorAtlasException;
+import com.indooratlas.android.IndoorAtlasFactory;
+import com.indooratlas.android.IndoorAtlasListener;
+import com.indooratlas.android.ServiceState;
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 
-        import java.util.ArrayList;
+import java.util.ArrayList;
 
 public class RequestingCoffeeActivity extends Activity implements IndoorAtlasListener {
     private ListView mLogView;
@@ -47,7 +45,8 @@ public class RequestingCoffeeActivity extends Activity implements IndoorAtlasLis
     private double longitude;
     private double latitude;
     private ParseObject retrieved;
-    private ArrayList<GeoPoint> coordList = new ArrayList<>();
+    private ArrayList<Double> coordList = new ArrayList<>();
+    private static GeoPoint gp;
 
 
     @Override
@@ -56,7 +55,7 @@ public class RequestingCoffeeActivity extends Activity implements IndoorAtlasLis
         setContentView(R.layout.requesting);
 //        mLogAdapter = new LogAdapter(this);
 //        mLogView.setAdapter(mLogAdapter);
-        sendGeoPointToParse();
+        initGeoPoint();
     }
 
     @Override
@@ -81,7 +80,7 @@ public class RequestingCoffeeActivity extends Activity implements IndoorAtlasLis
         return super.onOptionsItemSelected(item);
     }
 
-    public void sendGeoPointToParse() {
+    public void initGeoPoint() {
         // obtain instance to positioning service, note that calibrating might begin instantly
         try {
             mIndoorAtlas = IndoorAtlasFactory.createIndoorAtlas(
@@ -93,8 +92,6 @@ public class RequestingCoffeeActivity extends Activity implements IndoorAtlasLis
             e.printStackTrace();
         }
         startPositioning();
-
-
     }
 
 //    private void log(final String msg) {
@@ -110,20 +107,20 @@ public class RequestingCoffeeActivity extends Activity implements IndoorAtlasLis
 
     private void startPositioning() {
         if (mIndoorAtlas != null) {
-            android.util.Log.e("MCA",String.format("startPositioning, venueId: %s, floorId: %s, floorPlanId: %s",
+            android.util.Log.e("RCA",String.format("startPositioning, venueId: %s, floorId: %s, floorPlanId: %s",
                     mVenueId,
                     mFloorId,
                     mFloorPlanId));
             try {
                 mIndoorAtlas.startPositioning(mVenueId, mFloorId, mFloorPlanId);
-                android.util.Log.e("Th", "there is no error");
+                android.util.Log.e("RCA", "there is no error");
 
             } catch (IndoorAtlasException e) {
-                android.util.Log.e("MCA","startPositioning failed: " + e);
+                android.util.Log.e("RCA","startPositioning failed: " + e);
             }
 
         } else {
-            android.util.Log.e("MCA", "calibration not ready, cannot start positioning");
+            android.util.Log.e("RCA", "calibration not ready, cannot start positioning");
         }
     }
 
@@ -133,7 +130,6 @@ public class RequestingCoffeeActivity extends Activity implements IndoorAtlasLis
      * This is where you will handle location updates.
      */
     public void onServiceUpdate(ServiceState state) {
-
 //        mSharedBuilder.setLength(0);
 //        mSharedBuilder.append("Location: ")
 //                .append("\n\troundtrip : ").append(state.getRoundtrip()).append("ms")
@@ -149,39 +145,58 @@ public class RequestingCoffeeActivity extends Activity implements IndoorAtlasLis
 //        android.util.Log.e(mSharedBuilder.toString());
         latitude = state.getGeoPoint().getLatitude();
         longitude = state.getGeoPoint().getLongitude();
-        android.util.Log.e("MCA"," This is latitude " + latitude);
-        android.util.Log.e("MCA"," This is longitude " + longitude);
-        stopPositioning(state.getGeoPoint());
+        android.util.Log.e("RCA"," This is latitude " + latitude);
+        android.util.Log.e("RCA"," This is longitude " + longitude);
+        gp = state.getGeoPoint();
+        android.util.Log.e("RCA"," This is gp " + gp);
+//        stopPositioning(state.getGeoPoint());
+        stopPositioning();
     }
 
-    private void stopPositioning(GeoPoint g) {
+    private void stopPositioning() {
         mIsPositioning = false;
+
         if (mIndoorAtlas != null) {
-            android.util.Log.e("MCA","Stop positioning");
+            android.util.Log.e("RCA","Stop positioning");
+
             mIndoorAtlas.stopPositioning();
         }
-        sendToParse(g);
+
     }
 
-    private void sendToParse(GeoPoint g) {
-
+    public void sendToParse(View view) {
+        Log.e("RCA", "hi parse");
         ParseQuery<ParseObject> query = ParseQuery.getQuery("RecipientList");
+        Log.e("RCA", "query " + query);
+        Log.e("RCA", ParseStarterProjectActivity.getId());
         query.getInBackground(ParseStarterProjectActivity.getId(), new GetCallback<ParseObject>() {
             public void done(ParseObject object, ParseException e) {
                 if (e == null) {
                     RequestingCoffeeActivity.this.retrieved = object;
-
+                    Log.e("RCA", "Retrieved is this " + RequestingCoffeeActivity.this.retrieved);
+//                    Log.e("RCA", retrieved.getObjectId());
+                    Log.e("RCA", "wut parse");
+                    Log.e("RCA", "Retrieved " + retrieved);
+                    Log.e("RCA", "Retrieved is this " + RequestingCoffeeActivity.this.retrieved);
+                    coordList = (ArrayList) RequestingCoffeeActivity.this.retrieved.getList("coordList");
+                    Log.e("RCA", "fk parse");
+//                    coordList.add(gp);
+                    coordList.add(latitude);
+                    Log.e("RCA", "buck parse");
+                    retrieved.put("coordList", coordList);
+//                    retrieved.put("test", gp);
+                    Log.e("RCA", "eat parse");
+                    retrieved.saveInBackground();
+                    Log.e("RCA", "bye parse");
+                    Log.e("RCA", retrieved.getObjectId());
                 } else {
                     // something went wrong
+                    Log.e("RCA", "ian babby");
                     e.printStackTrace();
                 }
             }
         });
-        coordList = (ArrayList) retrieved.getList("coordList");
-        coordList.add(g);
-        retrieved.put("coordList", coordList);
-        retrieved.saveInBackground();
-        Log.e("RCA", retrieved.getObjectId());
+
     }
 
     @Override
