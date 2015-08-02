@@ -22,3 +22,9 @@ ext {
     minSdkVersion = 9
     targetSdkVersion = 22
 }
+
+dependencies {
+    apply plugin: 'java'
+    compile 'com.parse.bolts:bolts-android:1.+'
+    compile fileTree(dir: 'libs', include: 'Parse-*.jar')
+}
