@@ -11,47 +11,43 @@
         android:id="@+id/tvHeading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="40dp"
-        android:layout_marginTop="20dp"
-        android:text="Heading: 0.0" />
+        android:text="Heading: 0.0"
+        android:layout_below="@+id/textView3"
+        android:layout_centerHorizontal="true" />
 
     <ImageView
         android:id="@+id/imageViewCompass"
-        android:layout_width="600px"
-        android:layout_height="600px"
-        android:layout_below="@+id/tvHeading"
+        android:layout_width="750px"
+        android:layout_height="750px"
+        android:src="@drawable/compass"
+        android:layout_above="@+id/button7"
         android:layout_centerHorizontal="true"
-        android:src="@drawable/compass" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Next"
-        android:id="@+id/button5"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="111dp" />
+        android:layout_marginBottom="40dp" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Run out"
         android:id="@+id/button6"
+        android:onClick="quit"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="36dp"
-        android:onClick="quit" />
+        android:layout_alignRight="@+id/textView3"
+        android:layout_alignEnd="@+id/textView3"
+        android:layout_alignLeft="@+id/textView3"
+        android:layout_alignStart="@+id/textView3"
+        android:layout_marginBottom="20dp" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Update"
         android:id="@+id/button7"
-        android:layout_centerVertical="true"
-        android:layout_alignLeft="@+id/button5"
-        android:layout_alignStart="@+id/button5"
-        android:onClick="updateLocation" />
+        android:onClick="updateLocation"
+        android:layout_above="@+id/button6"
+        android:layout_alignLeft="@+id/button6"
+        android:layout_alignStart="@+id/button6"
+        android:layout_alignRight="@+id/button6"
+        android:layout_alignEnd="@+id/button6" />
 
     <TextView
         android:layout_width="wrap_content"
