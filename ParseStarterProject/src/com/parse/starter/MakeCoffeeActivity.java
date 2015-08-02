@@ -2,6 +2,7 @@ package com.parse.starter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,6 +21,10 @@ import com.indooratlas.android.IndoorAtlasException;
 import com.indooratlas.android.IndoorAtlasFactory;
 import com.indooratlas.android.IndoorAtlasListener;
 import com.indooratlas.android.ServiceState;
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 
 /*
 Not sure how to properly cite other people's work, but compass code from Mike Dalisay tutorial
@@ -42,6 +47,7 @@ import java.util.ArrayList;
 public class MakeCoffeeActivity extends Activity implements IndoorAtlasListener, SensorEventListener{
     private ListView mLogView;
     private LogAdapter mLogAdapter;
+    private static boolean deleteAll;
 
     private IndoorAtlas mIndoorAtlas;
     private boolean mIsPositioning;
@@ -66,6 +72,11 @@ public class MakeCoffeeActivity extends Activity implements IndoorAtlasListener,
     TextView tvHeading;
 
 
+    private ParseObject retrieved;
+    private ArrayList<Double> latList = new ArrayList<>();
+    private ArrayList<Double> longList = new ArrayList<>();
+    private TextView txt;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +93,9 @@ public class MakeCoffeeActivity extends Activity implements IndoorAtlasListener,
 
 //        mLogAdapter = new LogAdapter(this);
 //        mLogView.setAdapter(mLogAdapter);
+        deleteAll = false;
+        txt = (TextView) findViewById(R.id.textView3);
+
     }
 
     @Override
@@ -119,19 +133,91 @@ public class MakeCoffeeActivity extends Activity implements IndoorAtlasListener,
         }
         startPositioning();
 
+    }
+
+    public void quit(View view) {
+        deleteAll = true;
+        //need to clean up the ParseObject's lists
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("RecipientList");
+        query.getInBackground(ParseStarterProjectActivity.getId(), new GetCallback<ParseObject>() {
+            public void done(ParseObject object, ParseException e) {
+                if (e == null) {
+                    MakeCoffeeActivity.this.retrieved = object;
+                    retrieved.put("latList", new ArrayList<>());
+                    retrieved.put("longList", new ArrayList<>());
+                    retrieved.saveInBackground();
+                } else {
+                    // something went wrong
+                    Log.e("MCA", "ian babby");
+                    e.printStackTrace();
+                }
+            }
+        });
+        Intent intent = new Intent(this, ParseStarterProjectActivity.class);
+        this.startActivity(intent);
+    }
+
+    public static boolean shouldDelete() {
+        return deleteAll;
+    }
+
+    public void calculate() {
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("RecipientList");
+        query.getInBackground(ParseStarterProjectActivity.getId(), new GetCallback<ParseObject>() {
+            public void done(ParseObject object, ParseException e) {
+                if (e == null) {
+                    MakeCoffeeActivity.this.retrieved = object;
+                    latList = (ArrayList) MakeCoffeeActivity.this.retrieved.getList("latList");
+                    longList = (ArrayList) MakeCoffeeActivity.this.retrieved.getList("longList");
+                    double otherlat = 0;
+                    double otherlong = 0;
+                    Log.e("MCA", "latList: " + (ArrayList)  MakeCoffeeActivity.this.retrieved.getList("latList"));
+                    Log.e("MCA", "longList: " + (ArrayList) MakeCoffeeActivity.this.retrieved.getList("longList"));
+                    if (latList.size() != 0 ) {
+                        otherlat = latList.get(0);
+                        otherlong = longList.get(0);
+                    } else {
+                        txt.setText("Nobody wants coffee");
+                        return;
+                    }
+                    Log.e("MCA", (latitude - otherlat) + " fasdfasdf");
+                    Log.e("MCA", (longitude - otherlong) + " asdfasd");
+                    double horizontalDist = latitude - otherlat;
+                    double verticalDist = longitude -otherlong;
+                    txt.setText(calculateDirection(horizontalDist, verticalDist));
+                } else {
+                    // something went wrong
+                    Log.e("MCA", "ian babby");
+                    e.printStackTrace();
+                }
+            }
+        });
 
     }
 
-//    private void log(final String msg) {
-//        Log.d("hello", msg);
-//        runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                mLogAdapter.add(msg);
-//                mLogAdapter.notifyDataSetChanged();
-//            }
-//        });
-//    }
+    private String calculateDirection(double hd, double vd) {
+        if (Math.abs(hd) > Math.abs(2*vd)) {
+            if (hd > 0) {
+                return "Go East";
+            } else {
+                return "Go West";
+            }
+        } else if (Math.abs(vd) > Math.abs(2*hd)) {
+            if (vd > 0) {
+                return "Go North";
+            } else {
+                return "Go South";
+            }
+        } else if (hd > 0 && vd > 0) {
+            return "Go Northeast";
+        } else if (hd < 0 && vd > 0) {
+            return "Go Northwest";
+        } else if (hd > 0 && vd < 0) {
+            return "Go Southeast";
+        } else {
+            return "Go Southwest";
+        }
+    }
 
     private void startPositioning() {
         if (mIndoorAtlas != null) {
@@ -158,20 +244,6 @@ public class MakeCoffeeActivity extends Activity implements IndoorAtlasListener,
      * This is where you will handle location updates.
      */
     public void onServiceUpdate(ServiceState state) {
-
-//        mSharedBuilder.setLength(0);
-//        mSharedBuilder.append("Location: ")
-//                .append("\n\troundtrip : ").append(state.getRoundtrip()).append("ms")
-//                .append("\n\tlat : ").append(state.getGeoPoint().getLatitude())
-//                .append("\n\tlon : ").append(state.getGeoPoint().getLongitude())
-//                .append("\n\tX [meter] : ").append(state.getMetricPoint().getX())
-//                .append("\n\tY [meter] : ").append(state.getMetricPoint().getY())
-//                .append("\n\tI [pixel] : ").append(state.getImagePoint().getI())
-//                .append("\n\tJ [pixel] : ").append(state.getImagePoint().getJ())
-//                .append("\n\theading : ").append(state.getHeadingDegrees())
-//                .append("\n\tuncertainty: ").append(state.getUncertainty());
-
-//        android.util.Log.e(mSharedBuilder.toString());
         latitude = state.getGeoPoint().getLatitude();
         longitude = state.getGeoPoint().getLongitude();
         android.util.Log.e("MCA"," This is latitude " + latitude);
@@ -185,6 +257,8 @@ public class MakeCoffeeActivity extends Activity implements IndoorAtlasListener,
             android.util.Log.e("MCA","Stop positioning");
             mIndoorAtlas.stopPositioning();
         }
+        calculate();
+
     }
 
     @Override
@@ -340,4 +414,25 @@ public class MakeCoffeeActivity extends Activity implements IndoorAtlasListener,
             notifyDataSetChanged();
         }
     }
+
+//    public void next(View view) {
+//        ParseQuery<ParseObject> query = ParseQuery.getQuery("RecipientList");
+//        query.getInBackground(ParseStarterProjectActivity.getId(), new GetCallback<ParseObject>() {
+//            public void done(ParseObject object, ParseException e) {
+//                if (e == null) {
+//                    MakeCoffeeActivity.this.retrieved = object;
+//                    latList = (ArrayList) MakeCoffeeActivity.this.retrieved.getList("latList");
+//                    longList = (ArrayList) MakeCoffeeActivity.this.retrieved.getList("longList");
+//                    retrieved.saveInBackground();
+//                    if (RequestingCoffeeActivity.getNextable()) {
+//                        Intent intent = new Intent(this, MakeCoffeeActivity.class);
+//                    }
+//                } else {
+//                    // something went wrong
+//                    Log.e("RCA", "ian babby");
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
+//    }
 }
